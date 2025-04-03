@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "ngx_core.h": "c",
+        "ngx_http.h": "c",
+        "charconv": "c",
+        "ratio": "c",
+        "array": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "cstdlib": "c",
+        "ngx_config.h": "c"
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/g++"
+}

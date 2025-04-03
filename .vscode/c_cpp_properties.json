@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/home/harisheoran/nginx-plugin/nginx-1.25.3/src/core",
+                "/home/harisheoran/nginx-plugin/nginx-1.25.3/src/event",
+                "/home/harisheoran/nginx-plugin/nginx-1.25.3/src/http",
+                "/home/harisheoran/nginx-plugin/nginx-1.25.3/**",
+                "/home/harisheoran/nginx-plugin//nginx-1.25.3/src/http/modules",
+                "/usr/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/g++",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}
