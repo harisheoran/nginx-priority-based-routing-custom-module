@@ -102,7 +102,6 @@ static ngx_int_t ngx_priority_get_variable(ngx_http_request_t *request, ngx_http
 }
 
 // intialization
-// Registers ngx_priority_handler in the rewrite phase:
 // Initialization: Register the variable
 static ngx_int_t ngx_priority_init(ngx_conf_t *cf) {
     ngx_str_t var_name = ngx_string("my_priority_stream");
@@ -112,6 +111,7 @@ static ngx_int_t ngx_priority_init(ngx_conf_t *cf) {
     if (var == NULL) {
         return NGX_ERROR;
     }
+    // Links the getter to the variable.
     var->get_handler = ngx_priority_get_variable;
 
     return NGX_OK;

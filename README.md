@@ -1,7 +1,18 @@
 ## Nginx Custom Plugin
 - Priority based Routing
-- Flagging
-- Rate Limiting
+
+## Workflow
+- ngx_priority_init registers $my_priority_stream variable.
+
+A variable getter function (ngx_priority_get_variable) that computes $my_priority_stream on demand when Nginx needs
+
+- When a directive like proxy_pass references $my_priority_stream, Nginx calls the getter to get its value.
+
+- Check header
+
+- routing according to logic defined
+
+
 
 ### Priority Based Routing
 1. We need to define a special structure ```ngc_module_t``` which tell Nginx about my module and what it does.
@@ -56,3 +67,6 @@ http {
 
 
 ```
+
+## ISSUE
+rewrite phase didn't work - crashing with signal 11 (core dumped) 
