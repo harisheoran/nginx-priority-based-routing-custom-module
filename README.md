@@ -1,7 +1,7 @@
 ## Setup and run
 - Configure and build the Nginx with our custom module
 ```
-./configure --add-module=../ngx_priority_routing --with-http_stub_status_module --with-debug
+./configure --add-module=../<dir name of module> --with-http_stub_status_module --with-debug
 make -j$(nproc)
 sudo make install
 ```
