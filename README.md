@@ -2,6 +2,8 @@
 - Priority based Routing
 
 ## Workflow
+
+### Routing based on headers
 - ngx_priority_init registers $my_priority_stream variable.
 
 A variable getter function (ngx_priority_get_variable) that computes $my_priority_stream on demand when Nginx needs
@@ -12,7 +14,9 @@ A variable getter function (ngx_priority_get_variable) that computes $my_priorit
 
 - routing according to logic defined
 
-
+### Routing based on current load
+- Current Load: Active Connections
+- ngx_http_stub_status_module
 
 ### Priority Based Routing
 1. We need to define a special structure ```ngc_module_t``` which tell Nginx about my module and what it does.
