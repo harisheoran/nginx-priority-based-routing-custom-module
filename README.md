@@ -1,12 +1,29 @@
 ## Setup and run
 - Configure and build the Nginx with our custom module
-
 ```
 ./configure --add-module=../ngx_priority_routing --with-http_stub_status_module --with-debug
 make -j$(nproc)
 sudo make install
 ```
+- Start the Nginx
+```
+sudo /usr/local/nginx/sbin/nginx 
+```
+- Run two dummy servers on port 8080 and port 8081
+- Create Nginx conf file (check below) and test
+```
+sudo /usr/local/nginx/sbin/nginx -t     
+sudo /usr/local/nginx/sbin/nginx -s reload
+```
+- Send request to Nginx
+```
+curl http://127.0.0.1:8082
+```
 
+- Check logs
+```
+sudo tail -f /usr/local/nginx/logs/error.log /usr/local/nginx/logs/proxy.log /usr/local/nginx/logs/access.log
+```
 
 ## Nginx Custom Plugin
 - Priority based Routing
@@ -75,7 +92,7 @@ sudo make install
 - Nginx Conf file 
 ```
 worker_processes  1;
-error_log  logs/error.log debug;
+error_log  logs/error.log info;
 
 events {
     worker_connections  1024;
@@ -88,7 +105,6 @@ http {
     upstream low_priority_stream {
         server 127.0.0.1:8080;
     }
-
     server {
         listen 8082;
         location / {
@@ -101,9 +117,13 @@ http {
             error_log logs/proxy.log debug;
         }
     }
+    server {
+        listen 8083;
+        location /status {
+        stub_status;
+    }
 }
-
-
+}
 ```
 
 ## ISSUE
