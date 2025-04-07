@@ -48,11 +48,40 @@ ngx_module_t ngx_http_priority_load_module = {
 static ngx_int_t ngx_priority_get_variable(ngx_http_request_t *request, ngx_http_variable_value_t *nginx_variable, uintptr_t data) {
     ngx_log_error(NGX_LOG_INFO, request->connection->log, 0, "Priority handler started here man !!");
 
-    ngx_str_t high_stream = ngx_string("high_priority_stream");
-    ngx_str_t low_stream = ngx_string("low_priority_stream");
+    ngx_str_t allow = ngx_string("allow");  // No restrictions
+    ngx_str_t limit_premium = ngx_string("limit_premium");  // Apply rate limiting
+    ngx_str_t reject = ngx_string("reject");
 
-    ngx_str_t *stream_priority_value = &high_stream;
+    ngx_str_t *stream_priority_value = &allow;
     ngx_log_error(NGX_LOG_INFO, request->connection->log, 0, "Default Priority set %V", stream_priority_value);
+
+    // Check for premium user via header
+    ngx_uint_t is_premium = 0;
+    // Access the headers list (ngx_list_t)
+    ngx_list_part_t *part = &request->headers_in.headers.part; // First part of the list
+    ngx_table_elt_t *h = part->elts;                           // Array of headers in this part
+    ngx_uint_t i;
+
+    // Iterate over all parts and headers
+    for (i = 0; /* void */; i++) {
+        // If we've processed all headers in this part, move to the next part
+        if (i >= part->nelts) {
+            if (part->next == NULL) {
+                break; // No more parts to process
+            }
+            part = part->next; // Move to the next part
+            h = part->elts;    // Get the headers array for the new part
+            i = 0;             // Reset index
+        }
+
+        // Check for header "X-Premium-User"
+        if (ngx_strcasecmp(h[i].key.data, (u_char *)"X-Premium-User") == 0) {
+            if (ngx_strcasecmp(h[i].value.data, (u_char *)"true") == 0) {
+                is_premium = 1;
+            }
+            break;
+        }
+    }
     
     // Nginx tracks the total number of active connections across all worker processes at any moment
     // ngx_cycle is a global pointer (ngx_cycle_t *) to Nginx’s runtime cycle structure
@@ -63,14 +92,21 @@ static ngx_int_t ngx_priority_get_variable(ngx_http_request_t *request, ngx_http
     ngx_log_error(NGX_LOG_INFO, request->connection->log, 0, "Active Connections %ui , priority is %V", active_connections, stream_priority_value);
     
     // set the threshold
-    ngx_uint_t threshold = 60;
+    ngx_uint_t threshold = 30;
 
-    // check threshold and change the stream
-    if (active_connections > threshold){
-        stream_priority_value = &low_stream;
+    if (active_connections <= threshold) {
+        stream_priority_value = &allow; // Normal load: no rate limiting for anyone
+    } else {
+        if (is_premium) {
+            stream_priority_value = &limit_premium; // High load: rate limit premium users
+        } else {
+            stream_priority_value = &reject;    // High load: rate limit free users
+        }
     }
 
-    ngx_log_error(NGX_LOG_INFO, request->connection->log, 0, "Active Connections %ui , priority changed to %V", active_connections, stream_priority_value);
+    // Log the decision
+    ngx_log_error(NGX_LOG_INFO, request->connection->log, 0, "User: %s, Active Connections: %ui, Priority: %V", is_premium ? "premium" : "free", active_connections, stream_priority_value);
+
 
     // set the variable value for nginx to use
     nginx_variable->data = stream_priority_value->data;
